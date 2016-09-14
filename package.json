@@ -1,0 +1,19 @@
+{
+  "name": "base64-lib",
+  "version": "0.0.1",
+  "description": "Library providing base64 functionality.",
+  "main": "base64-lib.js",
+  "scripts": {
+    "test": "jasmine-node base64-lib.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmreed0112358/base64-lib.git"
+  },
+  "author": "Jeremy M. Reed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jmreed0112358/base64-lib/issues"
+  },
+  "homepage": "https://github.com/jmreed0112358/base64-lib#readme"
+}
