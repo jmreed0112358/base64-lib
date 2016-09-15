@@ -1,13 +1,22 @@
 'use strict';
 
-var Base64 = function () {},
-  NotImplementedException = require('./exceptions/NotImplementedException.js'),
+var NotImplementedException = require('./exceptions/NotImplementedException.js'),
   InvalidParameterException = require('./exceptions/InvalidParameterException.js'),
   InvalidStateException = require('./exceptions/InvalidStateException.js');
 
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
+  lookup = [],
   fullmask = 0xFFFFFFFFF, // 24 bits
   mask = 0x3F; // 6-bit.
+
+var Base64 = function () {
+  // Build lookup array.
+  for (var i = 0 ; i < alphabet.length ; i++) {
+    lookup[alphabet[i]] = i;
+  }
+
+  lookup['='] = 0;
+};
 
 Base64.prototype.getSegments = function (dataLength, number, i, pads) {
   var output = '',
@@ -45,6 +54,19 @@ Base64.prototype.getSegments = function (dataLength, number, i, pads) {
     }
 
     return output;
+};
+
+Base64.prototype.getPadCount = function (b64string) {
+  var pads = 0,
+    i = 0;
+
+  for (i = 0 ; i < b64string.length ; i++) {
+    if (b64string[i] === '=') {
+      pads += 1;
+    }
+  }
+
+  return pads;
 };
 
 Base64.prototype.encode = function (input) {
@@ -88,8 +110,50 @@ Base64.prototype.encode = function (input) {
   return output;
 };
 
-Base64.prototype.decode = function (input) {
-  throw new NotImplementedException();
+Base64.prototype.decode = function (b64string) {
+  var output = [],
+    pads = 0,
+    i = 0;
+
+  if ( b64string.length % 4 !== 0) {
+    throw new InvalidParameterException('b64string length must be a multiple of 4');
+  }
+
+  pads = this.getPadCount(b64string);
+
+  // Process segments, generate bytes.
+  for (i = 0 ; i < b64string.length ; i = i + 4) {
+    var number = 0;
+
+    number += lookup[b64string[i]];
+    number = number << 6;
+    number += lookup[b64string[i+1]];
+    number = number << 6;
+    number += lookup[b64string[i+2]];
+    number = number << 6;
+    number += lookup[b64string[i+3]];
+
+    if (i !== b64string.length - 4) {
+      output.push((number & 0xff0000) >> 16);
+      output.push((number & 0x00ff00) >> 8);
+      output.push(number & 0x0000ff);
+    } else {
+      if (pads === 0) {
+        output.push((number & 0xff0000) >> 16);
+        output.push((number & 0x00ff00) >> 8);
+        output.push(number & 0x0000ff);
+      } else if (pads === 1) {
+        output.push((number & 0xff0000) >> 16);
+        output.push((number & 0x00ff00) >> 8);
+      } else if (pads === 2) {
+        output.push((number & 0xff0000) >> 16);
+      } else {
+        throw new InvalidStateException('Invalid number of pads');
+      }
+    }
+  }
+
+  return new Uint8Array(output);
 };
 
 Base64.prototype.mapStringToByteArray = function (input) {
