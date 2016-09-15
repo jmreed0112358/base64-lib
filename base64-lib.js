@@ -37,7 +37,6 @@ Base64.prototype.getSegments = function (dataLength, number, i, pads) {
         segment = (number >> 12) & mask;
         output += alphabet[segment];
         output += '=';
-        segment = number & mask;
         output += '=';
       } else {
         throw new InvalidStateException('pads had invalid value???');
