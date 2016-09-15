@@ -124,7 +124,11 @@ Base64.prototype.decode = function (b64string) {
     pads = 0,
     i = 0;
 
-  if ( b64string.length % 4 !== 0) {
+  if (typeof b64string !== 'string') {
+    throw new InvalidParameterException('b64string must be a string');
+  }
+
+  if (b64string.length % 4 !== 0) {
     throw new InvalidParameterException('b64string length must be a multiple of 4');
   }
 

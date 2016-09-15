@@ -96,6 +96,14 @@ describe('base64 functions', function() {
       }
     });
 
+    it('should throw InvalidParameterException when given non-string inputs', function() {
+      var b64 = new Base64();
+      expect(function() {
+        b64.decode(22);
+      }).toThrow(
+        new InvalidParameterException('b64string must be a string'));
+    });
+
     it('should throw InvalidParameterException when given incorrect length base64 string', function() {
       var b64 = new Base64();
       expect(function () {
