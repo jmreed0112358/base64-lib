@@ -50,17 +50,31 @@ const plainStrings = [
       216, 248, 221 ])
   ]
 
-describe('base64', function() {
-  var b64 = new Base64();
+describe('base64 functions', function() {
+
+  describe('constructor', function() {
+    it('accept 64 char custom alphabet', function() {
+      var customb64 = new Base64('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/');
+    });
+
+    it('should throw exception when invalid alphabet is given.', function() {
+      expect(function() {
+        var customb64 = new Base64('Foo');
+      }).toThrow(
+        new InvalidParameterException('The custom alphabet must be 64 chars long'));
+    });
+  });
 
   describe('encode', function() {
     it('should convert a string to base64 properly', function () {
+      var b64 = new Base64();
       for (var i = 0 ; i < plainStrings.length ; i++) {
         expect(b64.encode(b64.mapStringToByteArray(plainStrings[i]))).toEqual(base64Strings[i]);
       }
     });
 
     it('should convert a byte array to base64 properly', function () {
+      var b64 = new Base64();
       for (var i = 0 ; i < byteArrays.length ; i++) {
         expect(b64.encode(byteArrays[i])).toEqual(base64Strings[i]);
       }
@@ -69,18 +83,21 @@ describe('base64', function() {
 
   describe('decode', function() {
     it('should convert base64 to a string properly', function () {
+      var b64 = new Base64();
       for (var i = 0 ; i < base64Strings.length ; i++) {
         expect(b64.mapByteArrayToString(b64.decode(base64Strings[i]))).toEqual(plainStrings[i]);
       }
     });
 
     it('should convert base64 to a byte array properly', function () {
+      var b64 = new Base64();
       for (var i = 0 ; i < base64Strings.length ; i++) {
         expect(b64.decode(base64Strings[i])).toEqual(byteArrays[i]);
       }
     });
 
     it('should throw InvalidParameterException when given incorrect length base64 string', function() {
+      var b64 = new Base64();
       expect(function () {
         b64.decode('raider');
       }).toThrow(
@@ -88,6 +105,7 @@ describe('base64', function() {
     });
 
     it('should throw InvalidStateException when there are too many pads.', function () {
+      var b64 = new Base64();
       expect(function () {
         b64.decode('foo99===');
       } ).toThrow(

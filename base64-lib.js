@@ -4,18 +4,28 @@ var NotImplementedException = require('./exceptions/NotImplementedException.js')
   InvalidParameterException = require('./exceptions/InvalidParameterException.js'),
   InvalidStateException = require('./exceptions/InvalidStateException.js');
 
-const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
-  lookup = [],
+const standardAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
   fullmask = 0xFFFFFFFFF, // 24 bits
   mask = 0x3F; // 6-bit.
 
-var Base64 = function () {
-  // Build lookup array.
-  for (var i = 0 ; i < alphabet.length ; i++) {
-    lookup[alphabet[i]] = i;
+var Base64 = function (customAlphabet) {
+  this.alphabet = '';
+  this.lookup = [];
+  if (customAlphabet !== undefined) {
+    if (customAlphabet.length !== 64) {
+      throw new InvalidParameterException('The custom alphabet must be 64 chars long');
+    }
+    this.alphabet = customAlphabet;
+  } else {
+    this.alphabet = standardAlphabet;
   }
 
-  lookup['='] = 0;
+  // Build this.lookup array.
+  for (var i = 0 ; i < this.alphabet.length ; i++) {
+    this.lookup[this.alphabet[i]] = i;
+  }
+
+  this.lookup['='] = 0;
 };
 
 Base64.prototype.getSegments = function (dataLength, number, i, pads) {
@@ -25,17 +35,17 @@ Base64.prototype.getSegments = function (dataLength, number, i, pads) {
   if (i === dataLength - 3 && pads !== 0) {
       if (pads === 1) {
         segment = (number >> 18) & mask;
-        output += alphabet[segment];
+        output += this.alphabet[segment];
         segment = (number >> 12) & mask;
-        output += alphabet[segment];
+        output += this.alphabet[segment];
         segment = (number >> 6) & mask;
-        output += alphabet[segment];
+        output += this.alphabet[segment];
         output += '=';
       } else if (pads === 2) {
         segment = (number >> 18) & mask;
-        output += alphabet[segment];
+        output += this.alphabet[segment];
         segment = (number >> 12) & mask;
-        output += alphabet[segment];
+        output += this.alphabet[segment];
         output += '=';
         output += '=';
       } else {
@@ -43,13 +53,13 @@ Base64.prototype.getSegments = function (dataLength, number, i, pads) {
       }
     } else {
       segment = (number >> 18) & mask;
-      output += alphabet[segment];
+      output += this.alphabet[segment];
       segment = (number >> 12) & mask;
-      output += alphabet[segment];
+      output += this.alphabet[segment];
       segment = (number >> 6) & mask;
-      output += alphabet[segment];
+      output += this.alphabet[segment];
       segment = number & mask;
-      output += alphabet[segment];
+      output += this.alphabet[segment];
     }
 
     return output;
@@ -124,13 +134,13 @@ Base64.prototype.decode = function (b64string) {
   for (i = 0 ; i < b64string.length ; i = i + 4) {
     var number = 0;
 
-    number += lookup[b64string[i]];
+    number += this.lookup[b64string[i]];
     number = number << 6;
-    number += lookup[b64string[i+1]];
+    number += this.lookup[b64string[i+1]];
     number = number << 6;
-    number += lookup[b64string[i+2]];
+    number += this.lookup[b64string[i+2]];
     number = number << 6;
-    number += lookup[b64string[i+3]];
+    number += this.lookup[b64string[i+3]];
 
     if (i !== b64string.length - 4) {
       output.push((number & 0xff0000) >> 16);
