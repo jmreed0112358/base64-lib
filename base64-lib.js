@@ -64,8 +64,6 @@ Base64.prototype.encode = function (input) {
   buffer = new ArrayBuffer(input.length + pads);
   uint8View = new Uint8Array(buffer);
 
-  console.log('buffer.length: ', buffer.length);
-
   // Load ArrayBuffer with data.
   for (i = 0 ; i < uint8View.length ; i++) {
       uint8View[i] = input[i];
@@ -75,7 +73,6 @@ Base64.prototype.encode = function (input) {
   for (i = 0 ; i < uint8View.length ; i += 3) {
     var chunks = new Uint8Array(buffer, i, 3),
       number = 0;
-    console.log('chunks: ', chunks);
 
     // Build 24 bit number.
     number = chunks[0];
@@ -83,8 +80,6 @@ Base64.prototype.encode = function (input) {
     number += chunks[1];
     number = number << 8;
     number += chunks[2];
-
-    console.log('number.toString(16): ', number.toString(16));
 
     // This section could be in a separate function.
     output += this.getSegments(uint8View.length, number, i, pads);
