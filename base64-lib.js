@@ -92,7 +92,7 @@ Base64.prototype.decode = function (input) {
   throw new NotImplementedException();
 };
 
-Base64.prototype.mapStringToArray = function (input) {
+Base64.prototype.mapStringToByteArray = function (input) {
   var buffer = new ArrayBuffer(input.length * 2),
     uint8View = new Uint8Array(buffer),
     uint16View = new Uint16Array(buffer),
