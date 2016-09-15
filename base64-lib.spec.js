@@ -25,6 +25,29 @@ const plainStrings = [
     'SQDxAHQA6wByAG4A4gB0AGkA9ABuAOAAbABpAHoA5gB0AGkA+ABuAAMmPdip3A==',
     'WgBRA2sDQwNqAwIDawM9A08DNAMZAyQDHgNJA1oDLwMeAyADTQNBAGsDVwM0A2IDNQMcAzADVANMAGgDZwNpA1gDIANHABEDVwMOAwUDWwNBAzQDOwNIA00DVAM5A08AQgMMAwwDWAMoAzUDOQM7Ax0DMwMhAD8DCwNlA2UDAgNjAxADAQMBA14DXANWAywDMAMZAxcD',
     'PNj63TzY+N082PrdPNj43Q=='
+  ],
+  byteArrays = [
+    new Uint8Array([ 70, 0, 111, 0, 111, 0, 32, 0, 66, 0, 97, 0, 114, 0 ]),
+    new Uint8Array([ 84, 0, 104, 0, 105, 0, 115, 0, 32, 0, 115, 0, 116, 0, 114, 0,
+      105, 0, 110, 0, 103, 0, 32, 0, 10, 0, 32, 0, 104, 0, 97, 0, 115, 0, 32, 0,
+      110, 0, 101,  0,  119, 0, 108, 0, 105, 0, 110, 0, 101, 0, 115, 0, 32, 0,
+      97, 0, 110, 0, 100, 0, 32, 0, 9, 0, 116, 0, 97, 0, 98, 0, 115, 0 ]),
+    new Uint8Array([ 109, 0, 97, 0, 241, 0, 97, 0, 110, 0, 97, 0 ]),
+    new Uint8Array([ 73, 0, 241, 0, 116, 0, 235, 0, 114, 0, 110, 0, 226, 0,
+      116, 0, 105, 0, 244, 0, 110, 0, 224, 0, 108, 0, 105, 0, 122, 0, 230, 0,
+      116, 0, 105, 0, 248, 0, 110, 0, 3, 38, 61, 216, 169, 220 ]),
+    new Uint8Array([ 90,  0,  81,  3,  107,  3,  67,  3,  106,  3,  2,  3,
+      107,  3,  61,  3,  79,  3,  52,  3,  25,  3,  36,  3,  30,  3,  73,  3,
+      90,  3,  47,  3,  30,  3,  32,  3,  77,  3,  65,  0,  107,  3,  87,  3,
+      52,  3,  98,  3,  53,  3,  28,  3,  48,  3,  84,  3,  76,  0,  104,  3,
+      103,  3,  105,  3,  88,  3,  32,  3,  71,  0,  17,  3,  87,  3,  14,  3,
+      5,  3,  91,  3,  65,  3,  52,  3,  59,  3,  72,  3,  77,  3,  84,  3,  57,
+      3,  79,  0,  66,  3,  12,  3,  12,  3,  88,  3,  40,  3,  53,  3,  57,
+      3,  59,  3,  29,  3,  51,  3,  33,  0,  63,  3,  11,  3,  101,  3,  101,
+      3,  2,  3,  99,  3,  16,  3,  1,  3,  1,  3,  94,  3,  92,  3,  86,  3,
+      44,  3,  48,  3,  25,  3,  23,  3 ]),
+    new Uint8Array([ 60, 216, 250, 221, 60, 216, 248, 221, 60, 216, 250, 221, 60,
+      216, 248, 221 ])
   ]
 
 describe('base64', function() {
@@ -33,24 +56,42 @@ describe('base64', function() {
   describe('encode', function() {
     it('should convert a string to base64 properly', function () {
       for (var i = 0 ; i < plainStrings.length ; i++) {
-        expect(b64.encode(b64.mapStringToArray(plainStrings[i]))).toEqual(base64Strings[i]);
+        expect(b64.encode(b64.mapStringToByteArray(plainStrings[i]))).toEqual(base64Strings[i]);
       }
     });
 
-    xit('should convert a byte array to base64 properly', function () {
-      throw new NotImplementedException();
+    it('should convert a byte array to base64 properly', function () {
+      for (var i = 0 ; i < byteArrays.length ; i++) {
+        expect(b64.encode(byteArrays[i])).toEqual(base64Strings[i]);
+      }
     });
   });
 
   describe('decode', function() {
-    xit('should convert base64 to a string properly', function () {
+    it('should convert base64 to a string properly', function () {
       for (var i = 0 ; i < base64Strings.length ; i++) {
-        expect(b64.decode(base64Strings[i])).toEqual(plainStrings[i]);
+        expect(b64.mapByteArrayToString(b64.decode(base64Strings[i]))).toEqual(plainStrings[i]);
       }
     });
 
-    xit('should convert base64 to a byte array properly', function () {
-      throw new NotImplementedException();
+    it('should convert base64 to a byte array properly', function () {
+      for (var i = 0 ; i < base64Strings.length ; i++) {
+        expect(b64.decode(base64Strings[i])).toEqual(byteArrays[i]);
+      }
+    });
+
+    it('should throw InvalidParameterException when given incorrect length base64 string', function() {
+      expect(function () {
+        b64.decode('raider');
+      }).toThrow(
+        new InvalidParameterException('b64string length must be a multiple of 4'));
+    });
+
+    it('should throw InvalidStateException when there are too many pads.', function () {
+      expect(function () {
+        b64.decode('foo99===');
+      } ).toThrow(
+        new InvalidStateException('Invalid number of pads'));
     });
   });
 });
