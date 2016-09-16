@@ -57,9 +57,16 @@ describe('base64 functions', function() {
       var customb64 = new Base64('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/');
     });
 
-    it('should throw exception when invalid alphabet is given.', function() {
+    it('should throw exception when invalid alphabet is given: too short.', function() {
       expect(function() {
         var customb64 = new Base64('Foo');
+      }).toThrow(
+        new InvalidParameterException('The custom alphabet must be 64 chars long'));
+    });
+
+    it('should throw exception when invalid alphabet is given: too long', function() {
+      expect(function() {
+        var customb64 = new Base64('lkajfskjfa;iowejfaiowjvcaoijvaiosjdfaksjdfaklsdjf;ashdfjahsdjkfhakjsdfhakdlsa');
       }).toThrow(
         new InvalidParameterException('The custom alphabet must be 64 chars long'));
     });
