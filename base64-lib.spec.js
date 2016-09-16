@@ -48,7 +48,7 @@ const plainStrings = [
       44,  3,  48,  3,  25,  3,  23,  3 ]),
     new Uint8Array([ 60, 216, 250, 221, 60, 216, 248, 221, 60, 216, 250, 221, 60,
       216, 248, 221 ])
-  ]
+  ];
 
 describe('base64 functions', function() {
 
